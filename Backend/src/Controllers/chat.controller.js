@@ -14,45 +14,45 @@ export async function sendMessageController(req,res){
         user:user.id,
         title,
         })
-        chatId=chat._id;    // INSTEAD OF SAME chatId can use chatId || chat._id
-    }
+        // chatId=chat._id;    // INSTEAD OF SAME chatId can use chatId || chat._id
+    }else{
+        chat = await chatModel.findOne({
+            _id:chatId,
+            user:user.id        
+            });
+            if (!chat) {
+                return res.status(404).json({
+                success: false,
+                message: "Chat not found",
+                });
+            }
+        }
 
     
     const userrequest = await msgModel.create({
-        chat:chatId,  // INSTEAD OF SAME chatId can use chatId || chat._id
+        chat:chatId || chat._id ,  // INSTEAD OF SAME chatId can use chatId || chat._id
         content:message,
         role:"user"
     })
     
     
     
-    const msgOfsameId = await msgModel.find({chat:chatId})
+    const msgOfsameId = await msgModel.find({chat:chat._id}).sort({createdAt:1});
     const result = await generateResponse(msgOfsameId);
     
-    const Aimessages = await msgModel.create({
-        chat:chatId, // INSTEAD OF SAME chatId can use chatId || chat._id
+    const Aimessage = await msgModel.create({
+        chat: chat._id, // INSTEAD OF SAME chatId can use chatId || chat._id
         content:result,
         role:"ai"
     })
     
-    const updatedmsglist = await msgModel.find({chat:chatId});
-
-    // const [result , title]=await Promise.all([
-    //     generateResponse(message),
-    //     generateTitle(message)
-    // ])
-
-    // res.status(201).json({
-    //     Title:title,
-    //     You:message,
-    //     AI:result,
-    //     success:true,
-    //     chat:chat,
-    //     message:messages
-    // })
+    const updatedmsglist = await msgModel.find({chat:chat._id});
+    const Aimessagelist = await msgModel.find({chat:chat._id,role:"ai"});
+  
     res.status(201).json({
-        title,
-       updatedmsglist,
+        title:chat.title,
+       chat,
+       Aimessage,
         
     })
 }

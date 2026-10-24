@@ -1,0 +1,32 @@
+
+DATA MODELLING
+-------------------------------
+authentication system(USER)
+chat with ai 
+chat history
+message session
+ai with internet research feature
+
+DATA MODELLING:-
+(1)Authentication
+    _id
+    username
+    email
+    password
+    verified
+    createdAt
+    updatedAt
+
+(2)CHAT
+    _id
+    user
+    title
+    createdAt
+    updatedAt
+
+(3)Message
+    _id
+    chat
+    content
+    role:[user,ai]
+    createdAt
