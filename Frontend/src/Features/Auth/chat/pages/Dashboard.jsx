@@ -3,7 +3,10 @@ import { useChat } from '../hooks/UseChat'
 import { useState } from 'react'
 import {useDispatch, useSelector } from 'react-redux' 
 import { setCurrentchatid } from '../chat.slice'
-
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import 'highlight.js/styles/github-dark.css'
 
 const Dashboard = () => {
   // const chat =useChat()
@@ -60,7 +63,7 @@ const Dashboard = () => {
        {(chats[currentchatid]?.messages ?? []).map((message, index) => (
           <div
             className={`flex w-full ${
-              message.role === "user" ? "justify-end" : "justify-start"
+              message.role === "user" ? "justify-end" : "justify-start mb-2"
             }`}
             key={`${currentchatid}-${index}`}
           >
@@ -71,14 +74,94 @@ const Dashboard = () => {
                   : "rounded-bl-sm border border-neutral-700 bg-neutral-900"
               }`}
             >
-              {message.content}
+              <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight]}
+        components={{
+          h1: ({ ...props }) => (
+            <h1 className="mb-3 mt-4 text-2xl font-bold" {...props} />
+          ),
+          h2: ({ ...props }) => (
+            <h2 className="mb-2 mt-4 text-xl font-bold" {...props} />
+          ),
+          h3: ({ ...props }) => (
+            <h3 className="mb-2 mt-3 text-lg font-semibold" {...props} />
+          ),
+          p: ({ ...props }) => (
+            <p className="mb-3 leading-7 last:mb-0" {...props} />
+          ),
+          ul: ({ ...props }) => (
+            <ul className="mb-3 list-disc space-y-1 pl-6" {...props} />
+          ),
+          ol: ({ ...props }) => (
+            <ol className="mb-3 list-decimal space-y-1 pl-6" {...props} />
+          ),
+          li: ({ ...props }) => <li className="pl-1" {...props} />,
+          strong: ({ ...props }) => (
+            <strong className="font-bold" {...props} />
+          ),
+          a: ({ ...props }) => (
+            <a
+              className="text-sky-400 underline"
+              target="_blank"
+              rel="noreferrer"
+              {...props}
+            />
+          ),
+          pre: ({ ...props }) => (
+            <pre
+              className="my-3 max-w-full overflow-x-auto rounded-lg border border-neutral-700 bg-[#161b22] p-4 text-sm"
+              {...props}
+            />
+          ),
+          code: ({ className, children, ...props }) => (
+            <code
+              className={`rounded text-sm ${
+                className ? '' : 'bg-neutral-700 px-1.5 py-0.5'
+              } ${className || ''}`}
+              {...props}
+            >
+              {children}
+            </code>
+          ),
+          blockquote: ({ ...props }) => (
+            <blockquote
+              className="my-3 border-l-4 border-neutral-500 pl-4 text-neutral-300"
+              {...props}
+            />
+          ),
+          table: ({ ...props }) => (
+            <div className="my-3 max-w-full overflow-x-auto">
+              <table
+                className="w-full border-collapse text-left text-sm"
+                {...props}
+              />
+            </div>
+          ),
+          th: ({ ...props }) => (
+            <th
+              className="border border-neutral-600 bg-neutral-700 px-3 py-2 font-semibold"
+              {...props}
+            />
+          ),
+          td: ({ ...props }) => (
+            <td
+              className="border border-neutral-700 px-3 py-2"
+              {...props}
+            />
+          ),
+          hr: () => <hr className="my-4 border-neutral-700" />,
+        }}
+      >
+        {String(message.content ?? '')}
+      </ReactMarkdown>
             </div>
           </div>
           ))}
         </div>
 
         <div className="border-t border-neutral-700 p-3 md:p-4">
-          <form onSubmit={handleSubmitMessage} className="mx-auto flex w-full max-w-4xl items-center gap-3 rounded-2xl border border-neutral-600 bg-neutral-900 px-4 py-3 focus-within:border-blue-500">
+          <form onSubmit={handleSubmitMessage} className=" mx-auto flex w-full max-w-4xl items-center gap-3 rounded-2xl border border-neutral-600 bg-neutral-900 px-4 py-3 focus-within:border-blue-500">
            <input
               className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-neutral-400"
               type="text"
